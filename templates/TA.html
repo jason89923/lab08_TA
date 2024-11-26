@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab08-摩斯密碼解碼-完成清單</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            text-align: center;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 800px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: auto;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+            color: white;
+        }
+        td a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        td a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Lab08-摩斯密碼解碼 完成清單</h1>
+    </header>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>組別</th>
+                    <th>連結</th>
+                </tr>
+            </thead>
+            <tbody id="studentTable">
+                <!-- 動態插入 -->
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const studentTable = document.getElementById('studentTable');
+    
+        // 初始化表格
+        function populateTable(data) {
+            studentTable.innerHTML = ""; // 清空現有表格內容
+    
+            data.forEach(entry => {
+                const row = document.createElement('tr');
+    
+                // 組別欄位
+                const groupCell = document.createElement('td');
+                groupCell.textContent = entry.group;
+    
+                // 連結欄位
+                const linkCell = document.createElement('td');
+                const link = document.createElement('a');
+                link.href = entry.link;
+                link.target = "_blank"; // 新開視窗
+                link.textContent = "查看連結";
+                linkCell.appendChild(link);
+    
+                // 添加至表格
+                row.appendChild(groupCell);
+                row.appendChild(linkCell);
+                studentTable.appendChild(row);
+            });
+        }
+    
+        // 建立 WebSocket 連線
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
+    
+        // 當 WebSocket 連線開啟時觸發
+        socket.addEventListener('open', () => {
+            console.log('WebSocket 已連線');
+        });
+
+        socket.on('message', function(data) {
+            try {
+                console.log(data)
+                const submit_list = data;
+                
+                if (Array.isArray(submit_list)) {
+                    populateTable(submit_list); // 更新表格內容
+                } else {
+                }
+            } catch (error) {
+                console.error("解析 WebSocket 訊息時發生錯誤：", error);
+            }
+        });
+    
+        // 當 WebSocket 關閉時觸發
+        socket.addEventListener('close', () => {
+            console.log('WebSocket 已關閉');
+        });
+    
+        // 當 WebSocket 發生錯誤時觸發
+        socket.addEventListener('error', error => {
+            console.error('WebSocket 發生錯誤：', error);
+        });
+    </script>
+    
+</body>
+</html>
+
+
